@@ -1,10 +1,10 @@
 import express from "express"
+const AuthRouter = express.Router();
 import validateSignupData from "../utlis/validation.js"
 import bcrypt from "bcrypt"
 import User from "../models/user.model.js"
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
-const AuthRouter = express.Router();
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
@@ -58,5 +58,12 @@ AuthRouter.post("/login", async(req,res)=>{
     }
 
 });
+AuthRouter.post("logout", async(req,res)=>{
+    res.cookie("token",null,{
+        expires:new Date(Date.now())
+    });
+    res.send("logout successfully");
+});
+
 
 export default AuthRouter;
