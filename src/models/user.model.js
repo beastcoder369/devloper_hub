@@ -1,67 +1,67 @@
-import mongoose from "mongoose"
-import validator from "validator"
+import mongoose from "mongoose";
+import validator from "validator";
 
-const userSchema = mongoose.Schema({
-    fristName:{
-        type : String,
-        require:true,
-        minLength:4,
-        maxLength:14
-        
-    },
-    lastName:{
-        type:String
-    },
-    emailId:{
-        type:String,
-        require:true,
-        unique:true,
-        lowercase:true,
-        trim:true,
-        validate(value){
-            if(!validator.isEmail(value)){
-                throw new Error("your email is not correct validate");
-            };
-            
-        }
-    },
-    password:{
-        type:String,
-        require:true,
-        validate(value){
-            if(!validator.isStrongPassword(value)){
-                throw new Error("password is not safe");
-            };
-        }
-        
-    },
-    age:{
-        type:Number,
-        require:true,
-        min:18,
-    },
-    gender:{
-        type:String,
-        require:true,
-        validate(value){
-            if(!["male","female","others"].includes(value)){
-                throw new Error("gender data is not valid ");
-            }
-        }
-    },
-    photoUrl:{
-        type:String
-    },
-    about:{
-        type:String,
-        default:"write about your self"
-    },
-    skills:{
-        type:[String],
-        require:true
+const userSchema = new mongoose.Schema({
+  firstName: {
+    type: String,
+    required: true,
+    minlength: 4,
+    maxlength: 14,
+    trim: true
+  },
+
+  lastName: {
+    type: String,
+    trim: true
+  },
+
+  emailId: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true,
+    validate(value) {
+      if (!validator.isEmail(value)) {
+        throw new Error("Email is not valid");
+      }
     }
+  },
+
+  password: {
+    type: String,
+    required: true,
+    validate(value) {
+      if (!validator.isStrongPassword(value)) {
+        throw new Error("Password is not strong enough");
+      }
+    }
+  },
+
+  age: {
+    type: Number,
+    min: 18
+  },
+
+  gender: {
+    type: String,
+    lowercase: true,
+    enum: ["male", "female", "others"]
+  },
+
+  photoUrl: {
+    type: String
+  },
+
+  about: {
+    type: String,
+    default: "Write about yourself"
+  },
+
+  skills: {
+    type: [String]
+  }
 });
 
-const User = mongoose.model("User",userSchema);
-
+const User = mongoose.model("User", userSchema);
 export default User;

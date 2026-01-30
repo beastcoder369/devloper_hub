@@ -6,26 +6,23 @@ import User from "../models/user.model.js"
 import jwt from "jsonwebtoken";
 import cookieParser from "cookie-parser";
 const app = express();
-app.use(express.json());
-app.use(cookieParser());
 
 
-
-AuthRouter.post("/signup", async (req, res) => {
+AuthRouter.post("/signup", async(req, res) => {
   try {
    validateSignupData(req);
-    const { fristName, lastName, password, emailId } = req.body;
+    const { firstName, lastName, password, emailId } = req.body;
     const passwordHash = await bcrypt.hash(password, 10);
     const user = new User({
-      fristName,
+      firstName,
       lastName,
       emailId,
       password: passwordHash,
     });
     await user.save();
     res.send("user added sucessfully");
-  } catch (error) {
-    res.status(400).send("error saving the user" + error.message);
+  } catch(error){
+    res.status(400).send("error something wrong" + error.message);
   }
 });
 
@@ -58,7 +55,7 @@ AuthRouter.post("/login", async(req,res)=>{
     }
 
 });
-AuthRouter.post("logout", async(req,res)=>{
+AuthRouter.post("/logout", async(req,res)=>{
     res.cookie("token",null,{
         expires:new Date(Date.now())
     });

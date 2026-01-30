@@ -2,8 +2,8 @@ import validator from "validator"
 
 
 const validateSignupData =(req)=>{
-    const {fristName,lastName,emailId,password}=req.body;
-    if(!fristName || !lastName){
+    const {firstName,lastName,emailId,password}=req.body;
+    if(!firstName || !lastName){
         throw new Error("name is not valid ");
     }
     else if (!validator.isEmail(emailId)){

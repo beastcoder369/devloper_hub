@@ -3,8 +3,10 @@ import connectDB from "./config/database.js"
 import AuthRouter from "./routes/auth.router.js";
 import profileRouter from "./routes/profile.router.js";
 import requestRouter from "./routes/request.router.js";
+import cookieParser from "cookie-parser";
 const app = express();
-
+app.use(express.json());
+app.use(cookieParser());
 
 app.use("/",AuthRouter);
 app.use("/",profileRouter);

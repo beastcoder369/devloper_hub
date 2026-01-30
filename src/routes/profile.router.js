@@ -3,6 +3,7 @@ import userAuth from "../middlewares/auth.js"
 
 const profileRouter = express.Router();
 
+
 profileRouter.get("/profile/view",userAuth, async(req,res)=>{
    try{
     const user = req.user
