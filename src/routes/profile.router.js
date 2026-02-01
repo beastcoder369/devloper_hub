@@ -1,6 +1,6 @@
 import express from "express"
 import userAuth from "../middlewares/auth.js"
-import {validateEditProfileData} from "../utlis/validation.js"
+import validateEditProfileData from "../utlis/validation.js"
 
 const profileRouter = express.Router();
 
@@ -15,7 +15,7 @@ profileRouter.get("/profile/view",userAuth, async(req,res)=>{
 });
 profileRouter.patch("/profile/edit", userAuth, async(req,res)=>{
    try{
-      if(!validateEditProfileData){
+      if(!validateEditProfileData){ 
          throw new Error("invalid request");
       }
       const loggedInUser = req.user;
@@ -23,9 +23,13 @@ profileRouter.patch("/profile/edit", userAuth, async(req,res)=>{
       loggedInUser[key] = req.body[key];
 });
       await loggedInUser.save();
+      res.send("the profile update complete");
    }catch(error){
       res.status(400).send("error"+error.message);
    }
+});
+profileRouter.patch("/profile/forgot-password", userAuth, async(req,res)=>{
+
 });
 
 export default profileRouter;

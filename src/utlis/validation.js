@@ -20,13 +20,13 @@ export const  validateEditProfileData = (req)=>{
         "firstName",
         "lastName",
         "emailId",
-        " photoUrl",
+        "photoUrl",
         "gender",
         "age",
         "about",
         "skills"
     ];
-    const isEditAllowed = Object.key(req.body).every((field)=>{
+    const isEditAllowed = Object.keys(req.body).every((field)=>{
         allowedEditFields.includes(field);
     });
     return isEditAllowed;
