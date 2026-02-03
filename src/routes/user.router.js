@@ -10,13 +10,13 @@ userRouter.get("/user/request/reccived", userAuth , async(req , res)=>{
     try{
         const safedata = ["firstName","lastName","skills","about","photoUrl","gender"];
         const loggedInUser = req.user;
-        const connectionRequest = await connectionRequest.find({
+        const connectionRequestData = await connectionRequest.find({
             toUserId:loggedInUser._id,
             status:"intrested"
         }).populate("fromUserId",safedata)
 
         res.json({message:"data fetched succesfully", 
-            data:connectionRequest
+            data:connectionRequestData
         });
 
     }catch(error){
@@ -25,68 +25,90 @@ userRouter.get("/user/request/reccived", userAuth , async(req , res)=>{
 });
 
 
-userRouter.get("/user/connection" , userAuth , async(req,res)=>{
-    try{
-        const safedata = ["firstName","lastName","skills","about","photoUrl","gender"];
-        const loggedInUser = req.user;
-        const connectionRequest = await connectionRequest.find({
-            $or:[
-                {toUserId:loggedInUser._id , status:"accepted"},
-                {fromUserId:loggedInUser._id , status:"accepted"}
-            ],
-        }).populate("fromUserId" , safedata) .populate("toUserId" , safedata)
+userRouter.get("/user/connection", userAuth, async (req, res) => {
+  try {
+    const safeData = ["firstName", "lastName", "skills", "about", "photoUrl", "gender"];
+    const loggedInUser = req.user;
 
-        const data = connectionRequest.map((row)=>{
-            if(row.fromUserId._id.tostring() === loggedInUser._id.tostring()){
-                return row.toUserId;
-            }
-           else{
-             return row.fromUserId;
-           }
-        });
-        res.json({message:"all data get "+ data});
+    const connectionRequestData = await connectionRequest
+      .find({
+        $or: [
+          { toUserId: loggedInUser._id, status: "accepted" },
+          { fromUserId: loggedInUser._id, status: "accepted" }
+        ],
+      })
+      .populate("fromUserId", safeData)
+      .populate("toUserId", safeData);
 
-    }catch(error){
-        res.status(400).json({message:"error"+ error.message});
-    }
+    const data = connectionRequestData.map((row) => {
+      if (row.fromUserId._id.toString() === loggedInUser._id.toString()) {
+        return row.toUserId;
+      } else {
+        return row.fromUserId;
+      }
+    });
 
+    res.status(200).json({
+      message: "All connections fetched successfully",
+      data,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error",
+      error: error.message,
+    });
+  }
 });
 
-userRouter.get("/feed", userAuth , async(req , res)=>{
-    try{
-        const safedata = ["firstName","lastName","skills","about","photoUrl","gender"];
-        const loggedInUser = req.user;
-        const page = parseInt(req.query.page);
-        let limit = parseInt(req.query.limit);
-        limit = limit>50?50:limit;
-        skip = (page-1)*limit;
-        const connectionRequest = await connectionRequest.find({
-            $or:[
-                {fromUserId:loggedInUser._id},
-                {toUserId:loggedInUser._id}
-            ]
-        }).select("fromUserId toUserId")
 
-        const hideUserFeed = new set();
-        connectionRequest.forEach(req=>{
-            hideUserFeed.add(req.fromUserId.tostring());
-            hideUserFeed.add(req.toUserId.tostring());
-        });
+userRouter.get("/feed", userAuth, async (req, res) => {
+  try {
+    const safeData = ["firstName", "lastName", "skills", "about", "photoUrl", "gender"];
+    const loggedInUser = req.user;
 
-        const user = await new User.find({
-            $and:[
-                {$nin:Array.from(hideUserFeed)},
-                {$ne:loggedInUser._id}
+    const page = parseInt(req.query.page) || 1;
+    let limit = parseInt(req.query.limit) || 10;
+    limit = limit > 50 ? 50 : limit;
 
-            ].skip(skip).limit(limit)
-        }).select(safedata)
+    const skip = (page - 1) * limit;
 
-        res.json({data:user});
+    const connectionRequestData = await connectionRequest
+      .find({
+        $or: [
+          { fromUserId: loggedInUser._id },
+          { toUserId: loggedInUser._id }
+        ]
+      })
+      .select("fromUserId toUserId");
 
-    }catch(error){
-        res.send("error"+error.message);
-    }
-}); 
+    const hideUserFeed = new Set();
+
+    connectionRequestData.forEach((req) => {
+      hideUserFeed.add(req.fromUserId.toString());
+      hideUserFeed.add(req.toUserId.toString());
+    });
+
+    const users = await User.find({
+      _id: {
+        $nin: Array.from(hideUserFeed),
+        $ne: loggedInUser._id
+      }
+    })
+      .select(safeData)
+      .skip(skip)
+      .limit(limit);
+
+    res.status(200).json({ data: users });
+
+  } catch (error) {
+    res.status(500).json({
+      message: "Server error",
+      error: error.message
+    });
+  }
+});
+
 
 
 export default userRouter;
