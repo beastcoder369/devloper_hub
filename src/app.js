@@ -4,6 +4,7 @@ import AuthRouter from "./routes/auth.router.js";
 import profileRouter from "./routes/profile.router.js";
 import requestRouter from "./routes/request.router.js";
 import cookieParser from "cookie-parser";
+import userRouter from "../src/routes/user.router.js";
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
@@ -11,6 +12,7 @@ app.use(cookieParser());
 app.use("/",AuthRouter);
 app.use("/",profileRouter);
 app.use("/",requestRouter);
+app.use("/",userRouter);
 
 
 connectDB().then(()=>{

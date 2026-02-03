@@ -4,6 +4,7 @@ import connectionRequest from "../models/connectionRequest.js";
 import User from "../models/user.model.js";
 
 
+
 const requestRouter = express.Router();
 
 requestRouter.post(
@@ -14,7 +15,7 @@ requestRouter.post(
       const fromUserId = req.user._id;
       const { toUserId, status } = req.params;
 
-      const allowedStatus = ["ignored", "interested"];
+      const allowedStatus = ["ignored", "intrested"];
       if (!allowedStatus.includes(status)) {
         return res.status(400).json({
           message: req.user.firstName + " is " + status + " in " + toUser.firstName
@@ -60,5 +61,48 @@ requestRouter.post(
     }
   }
 );
+
+requestRouter.post(
+  "/request/review/:status/:requestId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const loggedInUser = req.user; 
+      const { status, requestId } = req.params;
+
+      const allowedStatus = ["accepted", "rejected"];
+      if (!allowedStatus.includes(status)) {
+        return res
+          .status(400)
+          .json({ message: "the status should be valid this status not allowed" });
+      }
+
+      const connectionRequestData = await connectionRequest.findOne({ 
+        _id: requestId,                     
+        toUserId: loggedInUser._id,
+        status: "intrested",
+      });
+
+      if (!connectionRequestData) {
+        return res
+          .status(404)
+          .json({ message: "there is no connection request" });
+      }
+
+      connectionRequestData.status = status;
+      const data = await connectionRequestData.save(); 
+
+      res.status(200).json({                     
+        message: "connect request " + status,
+        data,
+      });
+    } catch (error) {
+      res.status(400).send("error " + error.message);
+    }
+  }
+);
+
+
+
 
 export default requestRouter;
