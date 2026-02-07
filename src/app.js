@@ -5,6 +5,11 @@ import profileRouter from "./routes/profile.router.js";
 import requestRouter from "./routes/request.router.js";
 import cookieParser from "cookie-parser";
 import userRouter from "../src/routes/user.router.js";
+import cors from "cors"
+app.use(cors({
+    origin:"http://localhost:5173/",
+    credentials:true,
+}));
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
