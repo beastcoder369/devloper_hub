@@ -1,33 +1,38 @@
-import express from "express"
-import connectDB from "./config/database.js"
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+
+import connectDB from "./config/database.js";
 import AuthRouter from "./routes/auth.router.js";
 import profileRouter from "./routes/profile.router.js";
 import requestRouter from "./routes/request.router.js";
-import cookieParser from "cookie-parser";
-import userRouter from "../src/routes/user.router.js";
-import cors from "cors"
-app.use(cors({
-    origin:"http://localhost:5173/",
-    credentials:true,
-}));
+import userRouter from "./routes/user.router.js";
+
 const app = express();
+
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
+
+
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/",AuthRouter);
-app.use("/",profileRouter);
-app.use("/",requestRouter);
-app.use("/",userRouter);
+app.use("/", AuthRouter);
+app.use("/", profileRouter);
+app.use("/", requestRouter);
+app.use("/", userRouter);
 
-
-connectDB().then(()=>{
-    console.log("mongodb database connect suceefully");
-    app.listen(3000, ()=>{
-    console.log("server is running on localhost:3000")
-}); 
-}).catch((error)=>{
-    console.error("database is not connected ");
-});
-
-
-
+connectDB()
+  .then(() => {
+    console.log("MongoDB database connected successfully");
+    app.listen(3000, () => {
+      console.log("Server is running on http://localhost:3000");
+    });
+  })
+  .catch((error) => {
+    console.error("Database is not connected", error);
+  });
