@@ -1,3 +1,4 @@
+import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -7,6 +8,9 @@ import AuthRouter from "./routes/auth.router.js";
 import profileRouter from "./routes/profile.router.js";
 import requestRouter from "./routes/request.router.js";
 import userRouter from "./routes/user.router.js";
+
+
+dotenv.config();
 
 const app = express();
 
@@ -26,10 +30,11 @@ app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
 
+
 connectDB()
   .then(() => {
     console.log("MongoDB database connected successfully");
-    app.listen(3000, () => {
+    app.listen(process.env.PORT, () => {
       console.log("Server is running on http://localhost:3000");
     });
   })

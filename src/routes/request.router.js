@@ -2,6 +2,7 @@ import express from "express"
 import userAuth from "../middlewares/auth.js"
 import connectionRequest from "../models/connectionRequest.js";
 import User from "../models/user.model.js";
+import * as SendEmail from "../utils/sendemail.js";
 
 
 
@@ -18,7 +19,7 @@ requestRouter.post(
       const allowedStatus = ["ignored", "intrested"];
       if (!allowedStatus.includes(status)) {
         return res.status(400).json({
-          message: req.user.firstName + " is " + status + " in " + toUser.firstName
+          message: "Invalid status. Allowed values: ignored, intrested"
         });
       }
 
@@ -36,8 +37,9 @@ requestRouter.post(
         }).populate("fromUserId toUserId",["firstName","lastName"]);
 
       if (existingConnectionRequest) {
-        return res.status(400).json({
-          message: "Connection request already exists"
+        return res.status(200).json({
+          message: "Connection request already exists",
+          data: existingConnectionRequest
         });
       }
 
@@ -48,6 +50,15 @@ requestRouter.post(
       });
 
       const data = await connectionRequestDoc.save();
+
+      // send email asynchronously so email errors don't break the request flow
+      SendEmail.run(
+        "New Friend Request",
+        `${req.user.firstName} is ${status} in ${toUser.firstName}`,
+        data
+      )
+        .then((emailRes) => console.log("✅ Email response:", emailRes))
+        .catch((err) => console.error("⚠️ Email send failed:", err.message || err));
 
       res.json({
         message: "Connection request sent successfully",

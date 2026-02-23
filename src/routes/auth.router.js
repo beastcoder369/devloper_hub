@@ -1,6 +1,6 @@
 import express from "express"
 const AuthRouter = express.Router();
-import validateSignupData from "../utlis/validation.js"
+import validateSignupData from "../utils/validation.js"
 import bcrypt from "bcrypt"
 import User from "../models/user.model.js"
 import jwt from "jsonwebtoken";
@@ -39,7 +39,7 @@ AuthRouter.post("/login", async(req,res)=>{
         }
         const isPasswordValid = await bcrypt.compare(password,user.password);
         if(isPasswordValid){
-            const token = jwt.sign({ _id: user._id }, "kartikgame@1234",{ expiresIn: "1d" });
+            const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET,{ expiresIn: "1d" });
             // console.log(token);
             res.cookie("token",token,{
                 httpOnly:true
